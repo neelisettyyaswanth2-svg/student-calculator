@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Grade & Percentage Calculator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f4f7f6;
+      color: #333;
+      padding: 30px 15px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      background: #ffffff;
+      max-width: 800px;
+      width: 100%;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      text-align: center;
+      color: #1e293b;
+      margin-bottom: 8px;
+      font-size: 24px;
+    }
+
+    p.subtitle {
+      text-align: center;
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .grade-legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      background: #f8fafc;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 24px;
+      font-size: 13px;
+    }
+
+    .grade-legend span {
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .student-info-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #334155;
+      font-size: 14px;
+    }
+
+    .subjects-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .subject-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 15px;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-calc {
+      background-color: #2563eb;
+      color: #ffffff;
+    }
+
+    .btn-calc:hover {
+      background-color: #1d4ed8;
+    }
+
+    .btn-reset {
+      background-color: #e2e8f0;
+      color: #334155;
+    }
+
+    .btn-reset:hover {
+      background-color: #cbd5e1;
+    }
+
+    .btn-pdf {
+      width: 100%;
+      margin-top: 24px;
+      background-color: #16a34a;
+      color: #ffffff;
+    }
+
+    .btn-pdf:hover {
+      background-color: #15803d;
+    }
+
+    .error-msg {
+      color: #dc2626;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+      text-align: center;
+    }
+
+    .results {
+      display: none;
+      border-top: 2px solid #f1f5f9;
+      padding-top: 24px;
+    }
+
+    .student-details-display {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .card .label {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+
+    .card .value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+      background-color: #f8fafc;
+      color: #475569;
+      font-size: 14px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .grade-A { background: #dcfce7; color: #166534; }
+    .grade-B { background: #dbeafe; color: #1e40af; }
+    .grade-C { background: #fef9c3; color: #854d0e; }
+    .grade-D { background: #ffedd5; color: #9a3412; }
+    .grade-F { background: #fee2e2; color: #991b1b; }
+    .grade-Absent { background: #fee2e2; color: #991b1b; }
+
+    @media print {
+      body {
+        background: #ffffff;
+        padding: 0;
+      }
+      .container {
+        box-shadow: none;
+        max-width: 100%;
+        padding: 10px;
+      }
+      .subtitle,
+      .student-info-grid,
+      .subjects-grid,
+      .actions,
+      .error-msg,
+      .btn-pdf {
+        display: none !important;
+      }
+      .results {
+        border-top: none;
+        padding-top: 0;
+        display: block !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Student Grade & Percentage Calculator</h1>
+    <p class="subtitle">Enter student details and marks (0-100). Leave blank if Absent.</p>
+
+    <div class="grade-legend">
+      <span class="grade-A">90–100: A</span>
+      <span class="grade-B">81–90: B</span>
+      <span class="grade-C">71–80: C</span>
+      <span class="grade-D">61–70: D</span>
+      <span class="grade-F">≤ 60: F</span>
+      <span class="grade-Absent">Blank: A (Absent)</span>
+    </div>
+
+    <div id="errorMsg" class="error-msg"></div>
+
+    <div class="student-info-grid">
+      <div class="input-group">
+        <label for="studentName">Student Name (Above 6 letters, No numbers)</label>
+        <input type="text" id="studentName" placeholder="Enter Student Name" />
+      </div>
+      <div class="input-group">
+        <label for="rollNumber">Roll Number</label>
+        <input type="text" id="rollNumber" placeholder="Enter Roll No" />
+      </div>
+    </div>
+
+    <div class="subjects-grid">
+      <div class="subject-row">
+        <input type="text" id="subName1" value="Mathematics" placeholder="Subject 1 Name" />
+        <input type="number" id="subMark1" min="0" max="100" placeholder="Marks (Blank = Absent)" />
+      </div>
+      <div class="subject-row">
+        <input type="text" id="subName2" value="Physics" placeholder="Subject 2 Name" />
+        <input type="number" id="subMark2" min="0" max="100" placeholder="Marks (Blank = Absent)" />
+      </div>
+      <div class="subject-row">
+        <input type="text" id="subName3" value="Chemistry" placeholder="Subject 3 Name" />
+        <input type="number" id="subMark3" min="0" max="100" placeholder="Marks (Blank = Absent)" />
+      </div>
+      <div class="subject-row">
+        <input type="text" id="subName4" value="English" placeholder="Subject 4 Name" />
+        <input type="number" id="subMark4" min="0" max="100" placeholder="Marks (Blank = Absent)" />
+      </div>
+      <div class="subject-row">
+        <input type="text" id="subName5" value="Computer Science" placeholder="Subject 5 Name" />
+        <input type="number" id="subMark5" min="0" max="100" placeholder="Marks (Blank = Absent)" />
+      </div>
+      <div class="subject-row">
+        <input type="text" id="subName6" value="Biology" placeholder="Subject 6 Name" />
+        <input type="number" id="subMark6" min="0" max="100" placeholder="Marks (Blank = Absent)" />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-calc" onclick="calculateResults()">Calculate Grade & Percentage</button>
+      <button class="btn-reset" onclick="resetForm()">Clear Fields</button>
+    </div>
+
+    <div id="resultsSection" class="results">
+      <div class="student-details-display">
+        <span id="displayName">Student Name: -</span>
+        <span id="displayRoll">Roll No: -</span>
+      </div>
+      
+      <div class="summary-cards">
+        <div class="card">
+          <div class="label">Total Marks</div>
+          <div class="value" id="totalMarks">0 / 600</div>
+        </div>
+        <div class="card">
+          <div class="label">Average</div>
+          <div class="value" id="averageMarks">0.00</div>
+        </div>
+        <div class="card">
+          <div class="label">Percentage</div>
+          <div class="value" id="percentage">0.00%</div>
+        </div>
+        <div class="card">
+          <div class="label">Overall Grade</div>
+          <div class="value" id="overallGrade">-</div>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Marks Obtained</th>
+            <th>Max Marks</th>
+            <th>Grade</th>
+          </tr>
+        </thead>
+        <tbody id="breakdownBody"></tbody>
+      </table>
+
+      <button class="btn-pdf" onclick="downloadPDF()">Download Result as PDF</button>
+    </div>
+  </div>
+
+  <script>
+    const submittedRecords = new Set();
+
+    function getGrade(score) {
+      if (score >= 90 && score <= 100) return 'A';
+      if (score >= 81 && score <= 90) return 'B';
+      if (score >= 71 && score <= 80) return 'C';
+      if (score >= 61 && score <= 70) return 'D';
+      return 'F';
+    }
+
+    function calculateResults() {
+      const errorMsg = document.getElementById('errorMsg');
+      const resultsSection = document.getElementById('resultsSection');
+      const breakdownBody = document.getElementById('breakdownBody');
+      
+      const studentNameInput = document.getElementById('studentName').value.trim();
+      const rollNumberInput = document.getElementById('rollNumber').value.trim();
+
+      errorMsg.style.display = 'none';
+      breakdownBody.innerHTML = '';
+
+      if (studentNameInput === '') {
+        errorMsg.textContent = 'Warning: Please enter the Student Name.';
+        errorMsg.style.display = 'block';
+        resultsSection.style.display = 'none';
+        return;
+      }
+
+      if (studentNameInput.length <= 6) {
+        errorMsg.textContent = 'Invalid Name: Student name must be more than 6 characters long.';
+        errorMsg.style.display = 'block';
+        resultsSection.style.display = 'none';
+        return;
+      }
+
+      const nameRegex = /^[A-Za-z\s]+$/;
+      if (!nameRegex.test(studentNameInput)) {
+        errorMsg.textContent = 'Invalid Name: Integers (numbers) or special characters are not allowed in the name.';
+        errorMsg.style.display = 'block';
+        resultsSection.style.display = 'none';
+        return;
+      }
+
+      if (rollNumberInput === '') {
+        errorMsg.textContent = 'Warning: Please enter the Roll Number.';
+        errorMsg.style.display = 'block';
+        resultsSection.style.display = 'none';
+        return;
+      }
+
+      const recordKey = `${studentNameInput.toLowerCase()}_${rollNumberInput.toLowerCase()}`;
+      if (submittedRecords.has(recordKey)) {
+        errorMsg.textContent = `Duplicate Error: Student "${studentNameInput}" with Roll Number "${rollNumberInput}" already exists! Please enter a different Roll Number.`;
+        errorMsg.style.display = 'block';
+        resultsSection.style.display = 'none';
+        return;
+      }
+
+      let total = 0;
+      const subjects = [];
+
+      for (let i = 1; i <= 6; i++) {
+        const subjectName = document.getElementById(`subName${i}`).value.trim() || `Subject ${i}`;
+        const markValue = document.getElementById(`subMark${i}`).value.trim();
+
+        if (markValue === '') {
+          // Absent case: Marks shows "Absent", Grade shows "A"
+          subjects.push({
+            name: subjectName,
+            markDisplay: 'Absent',
+            grade: 'A',
+            isAbsent: true
+          });
+        } else {
+          const mark = parseFloat(markValue);
+          if (isNaN(mark) || mark < 0 || mark > 100) {
+            errorMsg.textContent = `Invalid Marks: Marks for "${subjectName}" must be between 0 and 100.`;
+            errorMsg.style.display = 'block';
+            resultsSection.style.display = 'none';
+            return;
+          }
+
+          total += mark;
+          subjects.push({
+            name: subjectName,
+            markDisplay: mark,
+            grade: getGrade(mark),
+            isAbsent: false
+          });
+        }
+      }
+
+      submittedRecords.add(recordKey);
+
+      const average = total / 6;
+      const percentage = (total / 600) * 100;
+      const overallGrade = getGrade(percentage);
+
+      document.getElementById('displayName').textContent = `Student Name: ${studentNameInput}`;
+      document.getElementById('displayRoll').textContent = `Roll No: ${rollNumberInput}`;
+      document.getElementById('totalMarks').textContent = `${total} / 600`;
+      document.getElementById('averageMarks').textContent = average.toFixed(2);
+      document.getElementById('percentage').textContent = `${percentage.toFixed(2)}%`;
+
+      const overallEl = document.getElementById('overallGrade');
+      overallEl.innerHTML = `<span class="badge grade-${overallGrade}">${overallGrade}</span>`;
+
+      subjects.forEach(sub => {
+        const gradeClass = sub.isAbsent ? 'grade-Absent' : `grade-${sub.grade}`;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${sub.name}</td>
+          <td>${sub.markDisplay}</td>
+          <td>100</td>
+          <td><span class="badge ${gradeClass}">${sub.grade}</span></td>
+        `;
+        breakdownBody.appendChild(row);
+      });
+
+      resultsSection.style.display = 'block';
+    }
+
+    function resetForm() {
+      document.getElementById('studentName').value = '';
+      document.getElementById('rollNumber').value = '';
+      const defaults = ['Mathematics', 'Physics', 'Chemistry', 'English', 'Computer Science', 'Biology'];
+      for (let i = 1; i <= 6; i++) {
+        document.getElementById(`subName${i}`).value = defaults[i - 1];
+        document.getElementById(`subMark${i}`).value = '';
+      }
+      document.getElementById('errorMsg').style.display = 'none';
+      document.getElementById('resultsSection').style.display = 'none';
+    }
+
+    function downloadPDF() {
+      window.print();
+    }
+  </script>
+
+</body>
+</html>
